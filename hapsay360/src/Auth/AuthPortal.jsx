@@ -3,7 +3,7 @@ import { Mail, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function AuthPortal() {
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5173/api";
   const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
   const initialFormState = {
     first_name: "",
