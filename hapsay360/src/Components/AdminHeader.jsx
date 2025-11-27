@@ -6,7 +6,7 @@ const AdminHeader = ({
   username = "Admin User",
 }) => {
   return (
-    <header className="mb-6">
+    <header className="mb-3 bg-white p-6 shadow-md rounded-lg">
       <div className="flex items-center justify-between">
         <h1 className="text-5xl font-bold text-gray-900">{title}</h1>
 
@@ -14,12 +14,12 @@ const AdminHeader = ({
           <p className="text-xl text-gray-700">
             Welcome, <span className="font-semibold">{username}</span>
           </p>
-          <button className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-5 py-3 rounded-full font-medium">
+          <button className="mt-2 mb-2 flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-5 py-3 rounded-full font-medium">
             <UserCircle size={20} /> Profile
           </button>
         </div>
       </div>
-      <hr className="mt-6 border-gray-300" />
+      <hr className="mt-7 -mb-7 border-gray-300" />
     </header>
   );
 };

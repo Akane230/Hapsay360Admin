@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"; 
 import { Search, Download } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
@@ -106,7 +106,6 @@ const ClearanceTable = () => {
             {!isLoading &&
               !isError &&
               clearances.map((item) => {
-                // Badge colors
                 const paymentClass =
                   item.payment_status === "Success"
                     ? "bg-green-100 text-green-700"
@@ -157,14 +156,45 @@ const ClearanceTable = () => {
   );
 };
 
-const ClearancePage = () => (
-  <div className="flex">
-    <Sidebar activePage="clearance" />
-    <main className="ml-96 flex-1 min-h-screen overflow-y-auto bg-gray-100 p-10">
-      <AdminHeader title="Clearance Application" username="Admin User" />
-      <ClearanceTable />
-    </main>
-  </div>
-);
+const ClearancePage = () => {
+  const [isCollapsed, setIsCollapsed] = React.useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  }); 
+    
+  const toggleCollapse = () => {
+    setIsCollapsed(prev => {
+        const newValue = !prev;
+        localStorage.setItem('sidebarCollapsed', JSON.stringify(newValue));
+        return newValue;
+    });
+  };
+
+  return (
+    <div className="flex">
+      <Sidebar
+        activePage="clearance"
+        isCollapsed={isCollapsed}
+        toggleCollapse={toggleCollapse}
+      />
+
+      <main
+        className={`
+          flex-1 h-screen overflow-y-auto bg-gray-100 p-10
+          transition-all duration-300 ease-in-out
+          ${isCollapsed ? 'ml-20' : 'ml-96'}
+        `}
+      >
+        {/* ---- sticky header ---- */}
+        <div className="sticky -top-10 z-20 bg-gray-100 pt-4 pb-4">
+          <AdminHeader title="Clearance Application" username="Admin User" />
+        </div>
+
+        <ClearanceTable />
+      </main>
+    </div>
+  );
+};
+
 
 export default ClearancePage;
