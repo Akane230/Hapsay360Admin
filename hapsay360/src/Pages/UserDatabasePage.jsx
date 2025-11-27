@@ -163,14 +163,46 @@ const UserDatabaseTable = () => {
   );
 };
 
-const UserDatabasePage = () => (
-  <div className="flex">
-    <Sidebar activePage="users" />
-    <main className="ml-96 flex-1 min-h-screen overflow-y-auto bg-gray-100 p-10">
-      <AdminHeader title="User Database" username="Admin User" />
-      <UserDatabaseTable />
-    </main>
-  </div>
-);
+const UserDatabasePage = () => {
+  const [isCollapsed, setIsCollapsed] = React.useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  }); 
+    
+  const toggleCollapse = () => {
+    setIsCollapsed(prev => {
+      const newValue = !prev;
+      localStorage.setItem('sidebarCollapsed', JSON.stringify(newValue));
+      return newValue;
+    });
+  };
+
+  return (
+    <>
+      <div className="flex">
+        <Sidebar
+          activePage="users"
+          isCollapsed={isCollapsed}
+          toggleCollapse={toggleCollapse}
+        />
+        <main className={`
+                  flex-1 min-h-screen overflow-y-auto bg-gray-100 p-10 
+                  transition-all duration-300 
+                  ${isCollapsed ? 'ml-20' : 'ml-96'}
+              `}
+        >
+          <div className="sticky -top-10 -bottom-10 pt-4 bg-gray-100 z-20 pb-4 **w-full**">
+            <AdminHeader title="Registered Users" username="Admin User" />
+          </div>
+
+          <div className="pt-10">
+            <UserDatabaseTable />
+          </div>
+          
+        </main>
+      </div>
+    </>
+  );
+};
 
 export default UserDatabasePage;

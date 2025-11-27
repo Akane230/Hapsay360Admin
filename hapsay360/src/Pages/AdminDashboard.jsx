@@ -217,6 +217,7 @@ const LatestClearanceTable = () => {
 };
 
 const Announcements = () => (
+
   <div className="bg-white p-6 rounded-xl shadow-lg">
     <h3 className="text-2xl font-bold mb-4">Station Announcements</h3>
     <div className="flex flex-col gap-4">
@@ -246,18 +247,47 @@ const Announcements = () => (
   </div>
 );
 
-const AdminDashboard = () => (
-  <div className="flex">
-     <Sidebar activePage="dashboard" />
-    <main className="ml-96 flex-1 h-screen overflow-y-auto bg-gray-100 p-10">
-      <AdminHeader title="Dashboard Overview" username="Admin User" />
-      <DashboardCards />
-      <div className="mt-10">
-        <LatestClearanceTable />
-        <Announcements />
-      </div>
-    </main>
-  </div>
-);
+const AdminDashboard = () => {
+    const [isCollapsed, setIsCollapsed] = React.useState(() => {
+      const saved = localStorage.getItem('sidebarCollapsed');
+      return saved ? JSON.parse(saved) : false;
+    }); 
+      
+    const toggleCollapse = () => {
+      setIsCollapsed(prev => {
+          const newValue = !prev;
+          localStorage.setItem('sidebarCollapsed', JSON.stringify(newValue));
+          return newValue;
+      });
+    };
+    return ( 
+        <div className="flex">
+            <Sidebar 
+                activePage="dashboard" 
+                isCollapsed={isCollapsed} 
+                toggleCollapse={toggleCollapse} 
+            />
+    
+            <main className={`
+                    flex-1 min-h-screen overflow-y-auto bg-gray-100 p-10 
+                    transition-all duration-300 ease-in-out
+                    ${isCollapsed ? 'ml-20' : 'ml-96'} 
+                `}
+            >
+                <div className="sticky -top-10 -bottom-10 pt-4 bg-gray-100 z-20 pb-4 **w-full**">
+                    <AdminHeader title="Dashboard Overview" username="Admin User" />
+                </div>
+
+                <div className="pt-10">
+                  <DashboardCards />
+                </div>
+                <div className="mt-10">
+                    <LatestClearanceTable />
+                    <Announcements />
+                </div>
+            </main>
+        </div>
+    );
+};
 
 export default AdminDashboard;
