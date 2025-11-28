@@ -161,7 +161,7 @@ const BlotterTable = () => {
                 return (
                   <tr key={item._id} className="border-b hover:bg-gray-50">
                     <td className="p-3 text-purple-600 font-medium">
-                      {item._id}
+                      {item.custom_id}
                     </td>
                     <td className="p-3">{reporter.given_name} {reporter.surname}</td>
                     <td className="p-3">{incidentType}</td>
