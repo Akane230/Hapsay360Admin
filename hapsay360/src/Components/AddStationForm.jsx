@@ -1,5 +1,5 @@
 import {useState} from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import Modal from "./Modal";
 
@@ -7,10 +7,12 @@ const AddStationForm = ({ onClose } ) => {
 	const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 	const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
 
+	const queryClient = useQueryClient();
+
 	const [form, setForm] = useState({
 		name: "", 
 		address: "",
-		phone_number: "",
+		phone_number:"",
 		email: "",
 		landline: "",
 		latitude: "",
@@ -48,6 +50,7 @@ const AddStationForm = ({ onClose } ) => {
 		mutationFn: addStation,
 		onSuccess: (data) => {
 			console.log("Station added successfully", data);
+			queryClient.invalidateQueries({ queryKey: ["stations"] });
 		},
 		onError: (data) => {
 			console.error("Error adding station", data.error);
