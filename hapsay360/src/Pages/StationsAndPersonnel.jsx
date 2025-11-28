@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Search, UserPlus, Home, Users, Trash } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Search, UserPlus, Home, Users, Trash, Download } from "lucide-react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
 import AdminHeader from "../Components/AdminHeader";
@@ -8,7 +8,6 @@ import AddStationForm from "../Components/AddStationForm";
 import EditPersonnel from "../Components/EditPersonnel";
 import PersonnelExportPdf from "../Components/PersonnelExportPdf";
 import StationsExportPdf from "../Components/StationsExportPdf";
-
 
 const StationsAndPersonnel = () => {
   const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
@@ -28,6 +27,11 @@ const StationsAndPersonnel = () => {
   const [isAddPersonnelOpen, setIsAddPersonnelOpen] = useState(false);
   const [isEditPersonnelOpen, setIsEditPersonnelOpen] = useState(false);
   const [selectedOfficer, setSelectedOfficer] = useState(null);
+  const [isExportReady, setIsExportReady] = useState(false);
+
+  useEffect(() => {
+    return () => setIsExportReady(false);
+  }, [currentView]);
 
   // Fetch Officers
   const fetchOfficers = async () => {
@@ -43,7 +47,7 @@ const StationsAndPersonnel = () => {
     data: officers = [],
     isLoading: isLoadingOfficers,
     isError: isErrorOfficers,
-    isFetching: isFetchingOfficers,
+    // isFetching: isFetchingOfficers,
   } = useQuery({
     queryKey: ["officers"],
     queryFn: fetchOfficers,
@@ -63,7 +67,7 @@ const StationsAndPersonnel = () => {
     data: stations = [],
     isLoading: isLoadingStations,
     isError: isErrorStations,
-    isFetching: isFetchingStations,
+    // isFetching: isFetchingStations,
   } = useQuery({
     queryKey: ["stations"],
     queryFn: fetchStations,
@@ -82,6 +86,31 @@ const StationsAndPersonnel = () => {
     }
     return data;
   };
+
+  const deleteStation = async (id) => {
+    const response = await fetch(`${apiBaseUrl}police-stations/delete/${id}`, {
+      method: "DELETE",
+    });
+    const data = await response.json();
+    if (response.ok) {
+      alert("Station deleted successfully");
+    } else {
+      alert("Unable to delete station: " + (data.message || ""));
+    }
+    return data;
+  };
+
+  const { mutate: mutateDeleteStation } = useMutation({
+    mutationFn: deleteStation,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["stations"]);
+    },
+  });
+
+  const handleDeleteStation = (id) => {
+    if (window.confirm("Are you sure you want to delete this station?")) {
+      mutateDeleteStation(id);
+  }};
 
   const { mutate: mutateDeleteOfficer } = useMutation({
     mutationFn: deleteOfficer,
@@ -111,13 +140,12 @@ const StationsAndPersonnel = () => {
   };
 
   // Filter officers based on search
-  const filteredOfficers = officers.filter((officer) =>
-    `${officer.first_name} ${officer.last_name}`.toLowerCase().includes(searchInput.toLowerCase())
+  const filteredOfficers = (officers || []).filter((officer) =>
+    officer && `${officer.first_name} ${officer.last_name}`.toLowerCase().includes(searchInput.toLowerCase())
   );
 
-  // Filter stations based on search
-  const filteredStations = stations.filter((station) =>
-    station.name?.toLowerCase().includes(searchInput.toLowerCase())
+  const filteredStations = (stations || []).filter((station) =>
+    station && station.name?.toLowerCase().includes(searchInput.toLowerCase())
   );
 
   const currentTitle = currentView === 'personnel' ? 'Personnel' : 'Stations';
@@ -200,13 +228,19 @@ const StationsAndPersonnel = () => {
                   >
                     <Home size={18} /> Add Station
                   </button>
-                   {/* Add Export PDF buttons */}
-                    {currentView === 'personnel' ? (
-                      !isLoadingOfficers && !isFetchingOfficers && !isErrorOfficers &&
-                      <PersonnelExportPdf filteredOfficers={filteredOfficers} />
+                   {!isExportReady ? (
+                      <button
+                        onClick={() => setIsExportReady(true)}
+                        className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-shadow"
+                      >
+                        <Download size={18} /> Export PDF
+                      </button>
                     ) : (
-                      !isLoadingStations && !isFetchingStations && !isErrorStations &&
-                      <StationsExportPdf filteredStations={filteredStations} />
+                      currentView === 'personnel' ? (
+                        <PersonnelExportPdf filteredOfficers={filteredOfficers} />
+                      ) : (
+                        <StationsExportPdf filteredStations={filteredStations} />
+                      )
                     )}
                 </div>
               </div>
@@ -366,9 +400,15 @@ const StationsAndPersonnel = () => {
                             <td className="p-3 text-gray-700">
                               {station.officer_IDs?.length ?? 0}
                             </td>
-                            <td className="p-3 text-gray-700">
+                            <td className="p-3 text-gray-700 flex gap-2">
                               <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-shadow">
                                 View
+                              </button>
+                              <button 
+                                className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition flex items-center justify-center"
+                                onClick={() => handleDeleteStation(station._id)}
+                              >
+                                <Trash size={16} />
                               </button>
                             </td>
                           </tr>
