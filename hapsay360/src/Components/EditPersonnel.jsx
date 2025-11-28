@@ -55,6 +55,12 @@ const EditPersonnel = ({officer, onClose, stations}) => {
         }));
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        mutate(form);
+        onClose();
+    };
+
     const inner = (
         <div className="relative w-full max-w-lg bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="p-6">
@@ -151,10 +157,7 @@ const EditPersonnel = ({officer, onClose, stations}) => {
                     <div className="flex gap-3 pt-2">
                         <button
                             type="submit"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                mutate(form);
-                            }}
+                            onClick={handleSubmit}
                             disabled={isLoading}
                             className="flex-1 bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 disabled:opacity-60"
                         >

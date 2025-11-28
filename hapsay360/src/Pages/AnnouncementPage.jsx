@@ -1,5 +1,5 @@
 import React from "react"; 
-import { Search, Download } from "lucide-react";
+import { Search, Download, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
 import AdminHeader from "../Components/AdminHeader";
@@ -7,30 +7,43 @@ import AdminHeader from "../Components/AdminHeader";
 const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
 
-const fetchClearances = async () => {
-  const response = await fetch(`${apiBaseUrl}clearances/`);
+const fetchAnnouncements = async () => {
+  const response = await fetch(`${apiBaseUrl}announcements/`);
   if (!response.ok) {
-    throw new Error("Unable to fetch clearances");
+    throw new Error("Unable to fetch announcements");
   }
   const data = await response.json();
   return data?.data ?? [];
 };
 
-const ClearanceTable = () => {
+const AnnouncementTable = () => {
   const {
-    data: clearances = [],
+    data: announcements = [],
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["clearances"],
-    queryFn: fetchClearances,
+    queryKey: ["announcements"],
+    queryFn: fetchAnnouncements,
   });
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
 
   return (
     <div>
       {/* Title and welcome */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
-        <h2 className="text-3xl font-bold">Clearance & Payments Management</h2>
+        <h2 className="text-3xl font-bold">Announcement Management</h2>
+        <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-lg font-medium shadow-lg hover:shadow-2xl transition-shadow mt-4 md:mt-0">
+          <Plus size={18} /> Create Announcement
+        </button>
       </div>
 
       {/* Search & Export Platform */}
@@ -39,7 +52,7 @@ const ClearanceTable = () => {
           <Search size={20} className="text-gray-600 mr-3" />
           <input
             type="text"
-            placeholder="Search by applicant name or ID..."
+            placeholder="Search by title or station ID..."
             className="bg-transparent focus:outline-none w-full text-gray-700"
           />
         </div>
@@ -47,14 +60,9 @@ const ClearanceTable = () => {
         <div className="flex items-center gap-4">
           <select className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none">
             <option>Status: All</option>
-            <option>Approved</option>
-            <option>Pending</option>
-            <option>Rejected</option>
-          </select>
-          <select className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none">
-            <option>Payment: All</option>
-            <option>Success</option>
-            <option>Pending</option>
+            <option>Published</option>
+            <option>Draft</option>
+            <option>Archived</option>
           </select>
 
           <button className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-lg font-medium shadow-lg hover:shadow-2xl transition-shadow">
@@ -68,83 +76,75 @@ const ClearanceTable = () => {
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-100">
             <tr>
-              <th className="p-3 text-gray-600 font-semibold">ID</th>
-              <th className="p-3 text-gray-600 font-semibold">APPLICANT</th>
-              <th className="p-3 text-gray-600 font-semibold">PURPOSE</th>
-              <th className="p-3 text-gray-600 font-semibold">DATE APPLIED</th>
-              <th className="p-3 text-gray-600 font-semibold">
-                PAYMENT STATUS
-              </th>
-              <th className="p-3 text-gray-600 font-semibold">
-                CLEARANCE STATUS
-              </th>
+              <th className="p-3 text-gray-600 font-semibold">STATION ID</th>
+              <th className="p-3 text-gray-600 font-semibold">TITLE</th>
+              <th className="p-3 text-gray-600 font-semibold">AUTHOR</th>
+              <th className="p-3 text-gray-600 font-semibold">DATE PUBLISHED</th>
+              <th className="p-3 text-gray-600 font-semibold">STATUS</th>
               <th className="p-3 text-gray-600 font-semibold">ACTIONS</th>
             </tr>
           </thead>
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan="7" className="p-3 text-center text-gray-600">
-                  Loading clearances...
+                <td colSpan="6" className="p-3 text-center text-gray-600">
+                  Loading announcements...
                 </td>
               </tr>
             )}
             {isError && (
               <tr>
-                <td colSpan="7" className="p-3 text-center text-red-600">
-                  Unable to load clearances.
+                <td colSpan="6" className="p-3 text-center text-red-600">
+                  Unable to load announcements.
                 </td>
               </tr>
             )}
-            {!isLoading && !isError && clearances.length === 0 && (
+            {!isLoading && !isError && announcements.length === 0 && (
               <tr>
-                <td colSpan="7" className="p-3 text-center text-gray-700">
-                  No records found.
+                <td colSpan="6" className="p-3 text-center text-gray-700">
+                  No announcements found.
                 </td>
               </tr>
             )}
             {!isLoading &&
               !isError &&
-              clearances.map((item) => {
-                const paymentClass =
-                  item.payment_status === "Success"
+              announcements.map((item) => {
+                const statusClass =
+                  item.status === "Published"
                     ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700";
-                const clearanceClass =
-                  item.clearance_status === "APPROVED"
-                    ? "bg-green-100 text-green-700"
-                    : item.clearance_status === "PENDING"
+                    : item.status === "Draft"
                     ? "bg-yellow-100 text-yellow-700"
-                    : "bg-red-100 text-red-700";
+                    : "bg-gray-100 text-gray-700";
 
                 return (
-                  <tr key={item.id} className="border-b hover:bg-gray-50">
+                  <tr key={item._id} className="border-b hover:bg-gray-50">
                     <td className="p-3 text-purple-600 font-medium">
-                      {item.id}
+                      {item.station_id || "ALL"}
                     </td>
-                    <td className="p-3">{item.applicant}</td>
-                    <td className="p-3">{item.purpose}</td>
-                    <td className="p-3">{item.date_applied}</td>
+                    <td className="p-3 font-medium">{item.title}</td>
+                    <td className="p-3">{item.author || "Admin"}</td>
+                    <td className="p-3">{formatDate(item.date)}</td>
                     <td className="p-3">
                       <span
-                        className={`${paymentClass} px-2 py-1 rounded-full text-sm font-semibold`}
+                        className={`${statusClass} px-2 py-1 rounded-full text-sm font-semibold`}
                       >
-                        {item.payment_status}
+                        {item.status || "Published"}
                       </span>
                     </td>
                     <td className="p-3">
-                      <span
-                        className={`${clearanceClass} px-2 py-1 rounded-full text-sm font-semibold`}
-                      >
-                        {item.clearance_status}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      <button className="text-purple-600 hover:underline">
-                        {item.clearance_status === "APPROVED"
-                          ? "View/Print"
-                          : "Review"}
-                      </button>
+                      <div className="flex gap-2">
+                        <button className="text-blue-600 hover:underline">
+                          View
+                        </button>
+                        <span className="text-gray-400">|</span>
+                        <button className="text-purple-600 hover:underline">
+                          Edit
+                        </button>
+                        <span className="text-gray-400">|</span>
+                        <button className="text-red-600 hover:underline">
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -156,7 +156,7 @@ const ClearanceTable = () => {
   );
 };
 
-const ClearancePage = () => {
+const AnnouncementPage = () => {
   const [isCollapsed, setIsCollapsed] = React.useState(() => {
     const saved = localStorage.getItem('sidebarCollapsed');
     return saved ? JSON.parse(saved) : false;
@@ -173,7 +173,7 @@ const ClearancePage = () => {
   return (
     <div className="flex">
       <Sidebar
-        activePage="clearance"
+        activePage="announcements"
         isCollapsed={isCollapsed}
         toggleCollapse={toggleCollapse}
       />
@@ -187,14 +187,13 @@ const ClearancePage = () => {
       >
         {/* ---- sticky header ---- */}
         <div className="sticky -top-10 z-20 bg-gray-100 pt-4 pb-4">
-          <AdminHeader title="Clearance Application" username="Admin User" />
+          <AdminHeader title="Announcements" username="Admin User" />
         </div>
 
-        <ClearanceTable />
+        <AnnouncementTable />
       </main>
     </div>
   );
 };
 
-
-export default ClearancePage;
+export default AnnouncementPage;
