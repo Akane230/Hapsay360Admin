@@ -33,7 +33,7 @@ const StationsAndPersonnel = () => {
 
   // Reset export data when view changes
   useEffect(() => {
-    setExportData(null);
+    return () => setExportData(null);
   }, [currentView]);
 
   // Fetch Officers
