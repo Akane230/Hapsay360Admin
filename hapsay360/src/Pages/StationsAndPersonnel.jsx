@@ -8,11 +8,9 @@ import AddStationModal from "../Components/AddStationModal";
 import EditPersonnel from "../Components/EditPersonnel";
 import PersonnelExportPdf from "../Components/PersonnelExportPdf";
 import StationsExportPdf from "../Components/StationsExportPdf";
+import api from "../utils/api";
 
 const StationsAndPersonnel = () => {
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-  const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
-
   const queryClient = useQueryClient();
 
   // State management
@@ -38,7 +36,7 @@ const StationsAndPersonnel = () => {
 
   // Fetch Officers
   const fetchOfficers = async () => {
-    const response = await fetch(`${apiBaseUrl}officers/all`);
+    const response = await api.get("officers/all");
     if (!response.ok) {
       throw new Error("Unable to fetch officers");
     }
@@ -57,7 +55,7 @@ const StationsAndPersonnel = () => {
 
   // Fetch Stations
   const fetchStations = async () => {
-    const response = await fetch(`${apiBaseUrl}police-stations/getStations`);
+    const response = await api.get("police-stations/getStations");
     if (!response.ok) {
       throw new Error("Unable to fetch stations");
     }
@@ -76,9 +74,7 @@ const StationsAndPersonnel = () => {
 
   // Delete Officer
   const deleteOfficer = async (id) => {
-    const response = await fetch(`${apiBaseUrl}officers/delete/${id}`, {
-      method: "DELETE",
-    });
+    const response = await api.delete(`officers/delete/${id}`);
     const data = await response.json();
     if (response.ok) {
       alert("Officer deleted successfully");
@@ -89,9 +85,7 @@ const StationsAndPersonnel = () => {
   };
 
   const deleteStation = async (id) => {
-    const response = await fetch(`${apiBaseUrl}police-stations/delete/${id}`, {
-      method: "DELETE",
-    });
+    const response = await api.delete(`police-stations/delete/${id}`);
     const data = await response.json();
     if (response.ok) {
       alert("Station deleted successfully");
