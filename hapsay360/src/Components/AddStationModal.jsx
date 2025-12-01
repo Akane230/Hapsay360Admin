@@ -3,6 +3,7 @@ import { X, Home, Send, MapPin, Loader2, AlertTriangle, CheckCircle } from "luci
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import api from "../utils/api";
 
 // Fix Leaflet marker icons OUTSIDE component - runs once when module loads
 delete L.Icon.Default.prototype._getIconUrl;
@@ -80,9 +81,6 @@ const GoogleMapPicker = ({ initialPosition, onLocationSelect }) => {
 
 // --- AddStationModal Component ---
 const AddStationModal = ({ isOpen, onClose }) => {
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-  const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
-
   const queryClient = useQueryClient();
 
   const [isAddStationSuccess, setIsAddStationSuccess] = useState(false);
@@ -99,15 +97,8 @@ const AddStationModal = ({ isOpen, onClose }) => {
 
   const [error, setError] = useState(null);
 
-  // API function using the correct endpoint
   const addStation = async (payload) => {
-    const response = await fetch(`${apiBaseUrl}police-stations/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await api.post("police-stations/create", payload);
     const data = await response.json();
 
     if (!response.ok) {
@@ -117,7 +108,9 @@ const AddStationModal = ({ isOpen, onClose }) => {
     return data;
   };
 
-  const { mutate, isLoading: isSubmitting, isError, error: mutationError } = useMutation({
+  // API function using the correct endpoint
+
+  const { mutate: addStationMutation, isLoading: isSubmitting, isError, error: mutationError } = useMutation({
     mutationFn: addStation,
     onSuccess: (data) => {
       console.log("Station added successfully", data);
@@ -196,7 +189,7 @@ const AddStationModal = ({ isOpen, onClose }) => {
     }
 
     // Submit the form
-    mutate(formData);
+    addStationMutation(formData);
   };
 
   const handleClose = () => {

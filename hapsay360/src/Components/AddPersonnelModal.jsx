@@ -2,11 +2,9 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { X, UserPlus, Send } from "lucide-react";
+import api from "../utils/api";
 
 const AddPersonnelForm = ({ isOpen, onClose, stations = [] }) => {
-	const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-	const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
-
 	const queryClient = useQueryClient();
 
 	const [form, setForm] = useState({
@@ -18,14 +16,10 @@ const AddPersonnelForm = ({ isOpen, onClose, stations = [] }) => {
 		mobile_number: "",
 	});
 
+	const [ isAddPersonnelSuccess, setIsAddPersonnelSuccess ] = useState(false);
+
 	const addPersonnel = async (payload) => {
-		const response = await fetch(`${apiBaseUrl}officers/create`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(payload),
-		});
+		const response = await api.post("officers/create", payload);
 		const data = await response.json();
 		console.log(data);
 
@@ -44,11 +38,20 @@ const AddPersonnelForm = ({ isOpen, onClose, stations = [] }) => {
 		}
 	};
 
-	const { mutate, isLoading, isError, isSuccess, error } = useMutation({
+	const { mutate: addPersonnelMutation, isLoading, isError, error } = useMutation({
 		mutationFn: addPersonnel,
 		onSuccess: (data) => {
-			console.log("Personnel added successfully", data);
+			console.log("Personnel added:", data);
 			queryClient.invalidateQueries(["officers"]);
+			setForm({
+				first_name: "",
+				last_name: "",
+				email: "",
+				role: "",
+				station_id: "",
+				mobile_number: "",
+			});
+			setIsAddPersonnelSuccess(true);
 		},
 		onError: (data) => {
 			console.error("Error adding personnel", data.error);
@@ -65,7 +68,7 @@ const AddPersonnelForm = ({ isOpen, onClose, stations = [] }) => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		mutate(form);
+		addPersonnelMutation(form);
 		onClose();
 	};
 
@@ -90,7 +93,7 @@ const AddPersonnelForm = ({ isOpen, onClose, stations = [] }) => {
 				</div>
 
 				{/* Success/Error Messages */}
-				{isSuccess && (
+				{isAddPersonnelSuccess && (
 					<div className="mb-4 text-green-700 bg-green-50 border border-green-100 px-3 py-2 rounded">
 						Personnel added successfully.
 					</div>
