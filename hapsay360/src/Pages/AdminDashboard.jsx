@@ -13,12 +13,11 @@ import {
 import DashboardCard from "../Components/DashboardCard";
 import AdminHeader from "../Components/AdminHeader";
 import Sidebar from "../Components/Sidebar";
+import api from "../utils/api";
 
-const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
-
+// Authenticated API calls - automatically includes Authorization header
 const fetchUserCount = async () => {
-  const response = await fetch(`${apiBaseUrl}users/count`);
+  const response = await api.get("users/count");
   if (!response.ok) {
     throw new Error("Unable to fetch user count");
   }
@@ -27,7 +26,7 @@ const fetchUserCount = async () => {
 };
 
 const fetchClearances = async () => {
-  const response = await fetch(`${apiBaseUrl}clearance/getClearances`);
+  const response = await api.get("clearance/");
   if (!response.ok) {
     throw new Error("Unable to fetch clearances");
   }
@@ -36,7 +35,7 @@ const fetchClearances = async () => {
 };
 
 const fetchBlotters = async () => {
-  const response = await fetch(`${apiBaseUrl}blotters/getBlotters`);
+  const response = await api.get("blotters/getBlotters");
   if (!response.ok) {
     throw new Error("Unable to fetch blotter reports");
   }
