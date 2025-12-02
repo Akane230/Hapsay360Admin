@@ -8,7 +8,14 @@ const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
 
 const fetchClearances = async () => {
-  const response = await fetch(`${apiBaseUrl}clearance/getClearances`);
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${apiBaseUrl}clearance`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
   if (!response.ok) {
     throw new Error("Unable to fetch clearances");
   }
@@ -107,8 +114,9 @@ const ClearanceTable = () => {
               !isError &&
               clearances.map((item) => {
                 const paymentStatus = item.payment?.status;
+                const lowerPayment = String(paymentStatus || "").toLowerCase();
                 const paymentClass =
-                  paymentStatus === "paid"
+                  lowerPayment === "success" || lowerPayment === "paid"
                     ? "bg-green-100 text-green-700"
                     : "bg-red-100 text-red-700";
                 const clearanceClass =
@@ -122,7 +130,7 @@ const ClearanceTable = () => {
                 const applicant = item.user_id?.personal_info ??{ given_name: "Unknown", surname: "" };
                 const status = item.status || "pending";
                 return (
-                  <tr key={item.id} className="border-b hover:bg-gray-50">
+                  <tr key={item._id || item.id || item.custom_id} className="border-b hover:bg-gray-50">
                     <td className="p-3 text-purple-600 font-medium">
                       {item.custom_id}
                     </td>
