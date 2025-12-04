@@ -1,10 +1,17 @@
 import React from "react";
 import { UserCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AdminHeader = ({
   title = "Dashboard Overview",
   username = "Admin User",
 }) => {
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    navigate("/ProfilePage");
+  };
+
   return (
     <header className="mb-3 bg-white p-6 shadow-md rounded-lg">
       <div className="flex items-center justify-between">
@@ -14,7 +21,10 @@ const AdminHeader = ({
           <p className="text-xl text-gray-700">
             Welcome, <span className="font-semibold">{username}</span>
           </p>
-          <button className="mt-2 mb-2 flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-5 py-3 rounded-full font-medium">
+          <button 
+            onClick={handleProfileClick}
+            className="mt-2 mb-2 flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-5 py-3 rounded-full font-medium transition-colors"
+          >
             <UserCircle size={20} /> Profile
           </button>
         </div>
