@@ -9,6 +9,7 @@ import BlotterPage from "./Pages/BlotterPage";
 import SOSRequestsPage from "./Pages/SOSRequestsPage";
 import StationsAndPersonnel from './Pages/StationsAndPersonnel'
 import AnnouncementPage from "./Pages/AnnouncementPage";
+import ProfilePage from "./Pages/ProfilePage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/AnnouncementPage" element={<AnnouncementPage />} />
         <Route path="/UserDatabase" element={<UserDatabasePage />} />
         <Route path="/SOSRequestsPage" element={<SOSRequestsPage />} />
+        <Route path="/ProfilePage" element={<ProfilePage />}></Route>
       </Routes>
     </Router>
   );
