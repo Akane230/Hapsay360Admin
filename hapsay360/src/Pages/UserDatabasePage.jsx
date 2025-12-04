@@ -1,5 +1,6 @@
 import React from "react";
-import { Search, Download } from "lucide-react";
+import { Search, Download, Eye } from "lucide-react";
+import ActionButton from "../Components/ActionButton";
 import { useQuery } from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
 import AdminHeader from "../Components/AdminHeader";
@@ -149,9 +150,13 @@ const UserDatabaseTable = () => {
                       {user.last_activity || "N/A"}
                     </td>
                     <td className="p-3 text-gray-700">
-                      <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-shadow">
-                        View
-                      </button>
+                      <ActionButton
+                        label="View"
+                        icon={Eye}
+                        variant="info"
+                        size="sm"
+                        onClick={() => {}}
+                      />
                     </td>
                   </tr>
                 );

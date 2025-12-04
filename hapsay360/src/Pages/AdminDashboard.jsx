@@ -9,11 +9,13 @@ import {
   Database,
   Shield,
   UserCircle,
+  ArrowRight,
 } from "lucide-react";
 import DashboardCard from "../Components/DashboardCard";
 import AdminHeader from "../Components/AdminHeader";
 import Sidebar from "../Components/Sidebar";
 import api from "../utils/api";
+import ActionButton from "../Components/ActionButton";
 
 // Authenticated API calls - automatically includes Authorization header
 const fetchUserCount = async () => {
@@ -208,9 +210,14 @@ const LatestClearanceTable = () => {
         </thead>
         <tbody>{renderBody()}</tbody>
       </table>
-      <p className="text-indigo-600 mt-3 font-medium cursor-pointer hover:underline">
-        View All Clearances →
-      </p>
+      <ActionButton
+        label="View All Clearances"
+        icon={ArrowRight}
+        variant="link"
+        size="md"
+        className="mt-3"
+        onClick={() => {}}
+      />
     </div>
   );
 };

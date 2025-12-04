@@ -1,6 +1,6 @@
 import React from "react"; 
 import { useState } from "react";
-import { Search, Download, Plus } from "lucide-react";
+import { Search, Download, Plus, Eye, Pencil, Trash2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
 import AdminHeader from "../Components/AdminHeader";
@@ -8,6 +8,7 @@ import api from "../utils/api";
 import AnnouncementModal from "../Components/AnnouncementModal";
 import AnnouncementViewModal from "../Components/AnnouncementViewModal";
 import EditAnnouncementModal from "../Components/EditAnnouncementModal";
+import ActionButton from "../Components/ActionButton";
 
 const fetchAnnouncements = async () => {
   const response = await api.get("/announcements/");
@@ -246,17 +247,24 @@ const AnnouncementTable = () => {
                     </td>
                     <td className="p-3">
                       <div className="flex gap-2">
-                        <button onClick={() => handleViewAnnouncement(item)} className="text-blue-600 hover:underline">
-                          View
-                        </button>
-                        <span className="text-gray-400">|</span>
-                        <button onClick={() => handleEditAnnouncement(item)} className="text-purple-600 hover:underline">
-                          Edit
-                        </button>
-                        <span className="text-gray-400">|</span>
-                        <button onClick={() => handleDeleteAnnouncement(item._id)} className="text-red-600 hover:underline">
-                          Delete
-                        </button>
+                        <ActionButton
+                          label="View"
+                          icon={Eye}
+                          variant="info"
+                          onClick={() => handleViewAnnouncement(item)}
+                        />
+                        <ActionButton
+                          label="Edit"
+                          icon={Pencil}
+                          variant="accent"
+                          onClick={() => handleEditAnnouncement(item)}
+                        />
+                        <ActionButton
+                          label="Delete"
+                          icon={Trash2}
+                          variant="danger"
+                          onClick={() => handleDeleteAnnouncement(item._id)}
+                        />
                       </div>
                     </td>
                   </tr>

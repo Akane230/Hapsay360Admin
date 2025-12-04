@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, MapPin, FileText } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
 import AdminHeader from "../Components/AdminHeader";
+import ActionButton from "../Components/ActionButton";
 
 const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
@@ -146,15 +147,21 @@ const SOSRequestsTable = () => {
                       </span>
                     </td>
                     <td className="p-3">{item.responder}</td>
-                    <td className="p-3 flex gap-3">
-                      <button className="text-purple-600 hover:underline">
-                        View Map
-                      </button>
+                    <td className="p-3 flex flex-wrap gap-2">
+                      <ActionButton
+                        label="View Map"
+                        icon={MapPin}
+                        variant="success"
+                        onClick={() => {}}
+                      />
 
                       {item.status === "RESOLVED" && (
-                        <button className="text-blue-600 hover:underline">
-                          View Report
-                        </button>
+                        <ActionButton
+                          label="View Report"
+                          icon={FileText}
+                          variant="info"
+                          onClick={() => {}}
+                        />
                       )}
                     </td>
                   </tr>
