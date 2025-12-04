@@ -9,7 +9,6 @@ const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
 
 const fetchBlotters = async () => {
-  // Get token from localStorage (adjust the key name if different)
   const token = localStorage.getItem('token') || localStorage.getItem('authToken');
   
   if (!token) {
@@ -55,12 +54,10 @@ const BlotterTable = () => {
 
   return (
     <>
-      {/* Page Title */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
         <h2 className="text-3xl font-bold">Blotter Incident Reports</h2>
       </div>
 
-      {/* Search + Filters + Export */}
       <div className="bg-white p-6 rounded-xl shadow mb-6 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
         <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 w-full md:w-1/2 shadow">
           <Search size={20} className="text-gray-600 mr-3" />
@@ -68,6 +65,7 @@ const BlotterTable = () => {
             type="text"
             placeholder="Search by reporter name..."
             className="bg-transparent w-full focus:outline-none text-gray-700"
+            value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
@@ -76,6 +74,7 @@ const BlotterTable = () => {
           <label className="text-gray-700">Status:</label>
           <select
             className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none"
+            value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option>All</option>
@@ -91,6 +90,7 @@ const BlotterTable = () => {
           <label className="text-gray-700">Type:</label>
           <select
             className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none"
+            value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
           >
             <option>All</option>
@@ -107,7 +107,6 @@ const BlotterTable = () => {
         </button>
       </div>
 
-      {/* Table */}
       <div className="bg-white p-6 rounded-xl shadow overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-100">
@@ -176,10 +175,7 @@ const BlotterTable = () => {
                       label={!item.assigned_Officer ? "Assign & View" : "Update Status"}
                       icon={!item.assigned_Officer ? UserPlus : RefreshCw}
                       variant={!item.assigned_Officer ? "warning" : "accent"}
-                      onClick={() => {
-                        // Handle view/update action
-                        console.log("Action for blotter:", item._id);
-                      }}
+                      onClick={() => console.log("Action for blotter:", item._id)}
                     />
                   </td>
                 </tr>
@@ -207,30 +203,27 @@ const BlotterPage = () => {
   };
 
   return (
-    <>
-      <div className="flex">
-        <Sidebar
-          activePage="blotter"
-          isCollapsed={isCollapsed}
-          toggleCollapse={toggleCollapse}
-        />
-        <main className={`
-                  flex-1 h-screen overflow-y-auto bg-gray-100 p-10 
-                  transition-all duration-300 
-                  ${isCollapsed ? 'ml-20' : 'ml-96'}
-              `}
-        >
-          <div className="sticky -top-10 -bottom-10 pt-4 bg-gray-100 z-20 pb-4 w-full">
-            <AdminHeader title="Blotter Incident Reports" username="Admin User" />
-          </div>
+    <div className="flex">
+      <Sidebar
+        activePage="blotter"
+        isCollapsed={isCollapsed}
+        toggleCollapse={toggleCollapse}
+      />
+      <main className={`
+                flex-1 h-screen overflow-y-auto bg-gray-100 p-10 
+                transition-all duration-300 
+                ${isCollapsed ? 'ml-20' : 'ml-96'}
+            `}
+      >
+        <div className="sticky -top-10 -bottom-10 pt-4 bg-gray-100 z-20 pb-4 w-full">
+          <AdminHeader title="Blotter Incident Reports" username="Admin User" />
+        </div>
 
-          <div className="pt-10">
-            <BlotterTable />
-          </div>
-          
-        </main>
-      </div>
-    </>
+        <div className="pt-10">
+          <BlotterTable />
+        </div>
+      </main>
+    </div>
   );
 };
 
