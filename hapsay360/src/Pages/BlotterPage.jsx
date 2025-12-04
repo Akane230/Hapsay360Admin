@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, UserPlus, RefreshCw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
 import AdminHeader from "../Components/AdminHeader";
+import ActionButton from "../Components/ActionButton";
 
 const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
@@ -135,9 +136,12 @@ const BlotterTable = () => {
                   </td>
                   <td className="p-3">{officer}</td>
                   <td className="p-3">
-                    <button className="text-purple-600 hover:underline">
-                      {item.status === "NEW" ? "Assign & View" : "Update Status"}
-                    </button>
+                    <ActionButton
+                      label={item.status === "NEW" ? "Assign & View" : "Update Status"}
+                      icon={item.status === "NEW" ? UserPlus : RefreshCw}
+                      variant={item.status === "NEW" ? "warning" : "accent"}
+                      onClick={() => {}}
+                    />
                   </td>
                 </tr>
               );

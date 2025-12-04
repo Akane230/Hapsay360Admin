@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery} from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
 import AdminHeader from "../Components/AdminHeader";
 import UserDetailsModal from "../Components/UserDetailsModal";
 import { Search, Download } from "lucide-react";
+import ActionButton from "../Components/ActionButton";
+import { Eye } from "lucide-react";
 
 const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
@@ -211,13 +213,14 @@ const UserDatabaseTable = ({ openModal }) => {
                         ? new Date(lastActivity).toLocaleDateString()
                         : "N/A"}
                     </td>
-                    <td className="p-3">
-                      <button
+                    <td className="p-3 flex items-center gap-2">
+                      <ActionButton
+                        label="View"
+                        variant="info"
+                        size="sm"
+                        icon={Eye}
                         onClick={() => openModal(user._id)}
-                        className="bg-blue-500 text-white px-3 py-2 rounded-lg"
-                      >
-                        View
-                      </button>
+                      />
                     </td>
                   </tr>
                 );

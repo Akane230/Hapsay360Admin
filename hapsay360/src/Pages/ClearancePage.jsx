@@ -1,8 +1,9 @@
 import React from "react"; 
-import { Search, Download } from "lucide-react";
+import { Search, Download, Printer, ClipboardCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
 import AdminHeader from "../Components/AdminHeader";
+import ActionButton from "../Components/ActionButton";
 
 const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 const apiBaseUrl = baseUrl?.endsWith("/") ? baseUrl : `${baseUrl}/`;
@@ -152,11 +153,12 @@ const ClearanceTable = () => {
                       </span>
                     </td>
                     <td className="p-3">
-                      <button className="text-purple-600 hover:underline">
-                        {status === "APPROVED"
-                          ? "View/Print"
-                          : "Review"}
-                      </button>
+                      <ActionButton
+                        label={status === "APPROVED" ? "View / Print" : "Review"}
+                        icon={status === "APPROVED" ? Printer : ClipboardCheck}
+                        variant={status === "APPROVED" ? "info" : "warning"}
+                        onClick={() => {}}
+                      />
                     </td>
                   </tr>
                 );

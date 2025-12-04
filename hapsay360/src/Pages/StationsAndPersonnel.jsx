@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Search, UserPlus, Home, Users, Trash, Download } from "lucide-react";
+import { Search, UserPlus, Home, Users, Trash, Download, Pencil, Eye } from "lucide-react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import Sidebar from "../Components/Sidebar";
 import AdminHeader from "../Components/AdminHeader";
 import AddPersonnelModal from "../Components/AddPersonnelModal";
 import AddStationModal from "../Components/AddStationModal";
 import EditPersonnel from "../Components/EditPersonnel";
+import ViewPoliceStationModal from "../Components/ViewPoliceStationModal";
+import ViewPersonnelModal from "../Components/ViewPersonnelModal";
 import PersonnelExportPdf from "../Components/PersonnelExportPdf";
 import StationsExportPdf from "../Components/StationsExportPdf";
 import api from "../utils/api";
+import ActionButton from "../Components/ActionButton";
+import EditStationModal from "../Components/EditStationModal";
 
 const StationsAndPersonnel = () => {
   const queryClient = useQueryClient();
@@ -25,6 +29,10 @@ const StationsAndPersonnel = () => {
   const [isAddPersonnelOpen, setIsAddPersonnelOpen] = useState(false);
   const [isEditPersonnelOpen, setIsEditPersonnelOpen] = useState(false);
   const [selectedOfficer, setSelectedOfficer] = useState(null);
+  const [selectedStation, setSelectedStation] = useState(null);
+  const [isViewStationOpen, setIsViewStationOpen] = useState(false);
+  const [isViewPersonnelOpen, setIsViewPersonnelOpen] = useState(false);
+  const [isEditStationOpen, setIsEditStationOpen] = useState(false);
   
   // NEW: Store snapshot of data when export is clicked
   const [exportData, setExportData] = useState(null);
@@ -133,6 +141,20 @@ const StationsAndPersonnel = () => {
   const showEditPersonnelModal = (officer) => {
     setSelectedOfficer(officer);
     setIsEditPersonnelOpen(true);
+  };
+
+  const showViewPersonnel = (officer) => {
+    setSelectedOfficer(officer);
+    setIsViewPersonnelOpen(true);
+  };
+
+  const showViewStation = (station) => {
+    setSelectedStation(station);
+    setIsViewStationOpen(true);
+  };
+  const showEditStationModal = (station) => {
+    setSelectedStation(station);
+    setIsEditStationOpen(true);
   };
 
   // Filter officers based on search
@@ -276,6 +298,27 @@ const StationsAndPersonnel = () => {
                 stations={stations}
               />
             )}
+            {isViewPersonnelOpen && selectedOfficer && (
+              <ViewPersonnelModal
+                isOpen={isViewPersonnelOpen}
+                onClose={() => setIsViewPersonnelOpen(false)}
+                officer={selectedOfficer}
+              />
+            )}
+            {isViewStationOpen && selectedStation && (
+              <ViewPoliceStationModal
+                isOpen={isViewStationOpen}
+                onClose={() => setIsViewStationOpen(false)}
+                station={selectedStation}
+              />
+            )}
+            {isEditStationOpen && selectedStation && (
+              <EditStationModal
+                isOpen={isEditStationOpen}
+                onClose={() => setIsEditStationOpen(false)}
+                selectedStation={selectedStation}
+              />
+            )}
 
             {/* Dynamic Table Rendering */}
             <div className="bg-white p-8 rounded-xl shadow-lg">
@@ -352,18 +395,27 @@ const StationsAndPersonnel = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                   <div className="flex gap-2">
-                                    <button
+                                    <ActionButton
+                                      label="View"
+                                      icon={Eye}
+                                      variant="info"
+                                      size="sm"
+                                      onClick={() => showViewPersonnel(officer)}
+                                    />
+                                    <ActionButton
+                                      label="Edit"
+                                      icon={Pencil}
+                                      variant="accent"
+                                      size="sm"
                                       onClick={() => showEditPersonnelModal(officer)}
-                                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-shadow"
-                                    >
-                                      Edit
-                                    </button>
-                                    <button
+                                    />
+                                    <ActionButton
+                                      label="Delete"
+                                      icon={Trash}
+                                      variant="danger"
+                                      size="sm"
                                       onClick={() => handleDeleteOfficer(officer._id)}
-                                      className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition flex items-center justify-center"
-                                    >
-                                      <Trash size={16} />
-                                    </button>
+                                    />
                                   </div>
                                 </td>
                               </tr>
@@ -428,15 +480,27 @@ const StationsAndPersonnel = () => {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm">
                                 <div className="flex gap-2">
-                                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-shadow">
-                                    View
-                                  </button>
-                                  <button 
-                                    className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition flex items-center justify-center"
+                                  <ActionButton
+                                    label="View"
+                                    icon={Eye}
+                                    variant="info"
+                                    size="sm"
+                                    onClick={() => showViewStation(station)}
+                                  />
+                                  <ActionButton
+                                    label="Edit"
+                                    icon={Pencil}
+                                    variant="accent"
+                                    size="sm"
+                                    onClick={() => showEditStationModal(station)}
+                                  />
+                                  <ActionButton
+                                    label="Delete"
+                                    icon={Trash}
+                                    variant="danger"
+                                    size="sm"
                                     onClick={() => handleDeleteStation(station._id)}
-                                  >
-                                    <Trash size={16} />
-                                  </button>
+                                  />
                                 </div>
                               </td>
                             </tr>
