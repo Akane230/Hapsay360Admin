@@ -1,13 +1,38 @@
 import React from 'react';
 import { X, User, Calendar, FileText, CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import Modal from './Modal';
 import api from '../utils/api';
 
 const ViewBlotterModal = ({ isOpen, onClose, blotter, onEdit }) => {
-  if (!isOpen || !blotter) return null;
-
   const queryClient = useQueryClient();
+
+  // Fetch officer profile picture as blob if it exists
+  const { data: officerProfilePicUrl } = useQuery({
+    queryKey: ['officerProfilePic', blotter?.assigned_Officer?._id],
+    queryFn: async () => {
+      if (!blotter?.assigned_Officer?._id) return null;
+      try {
+        const response = await api.get(`/officers/${blotter.assigned_Officer._id}/picture`);
+        if (!response.ok) return null;
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+      } catch (error) {
+        console.error('Failed to fetch officer profile picture:', error);
+        return null;
+      }
+    },
+    enabled: isOpen && !!blotter?.assigned_Officer?._id,
+  });
+
+  // Cleanup blob URL when component unmounts
+  React.useEffect(() => {
+    return () => {
+      if (officerProfilePicUrl) {
+        URL.revokeObjectURL(officerProfilePicUrl);
+      }
+    };
+  }, [officerProfilePicUrl]);
 
   const deleteBlotter = async () => {
     const response = await api.delete(`blotters/delete/${blotter._id}`);
@@ -27,6 +52,8 @@ const ViewBlotterModal = ({ isOpen, onClose, blotter, onEdit }) => {
       alert(err.message || 'Failed to delete blotter');
     },
   });
+
+  if (!isOpen || !blotter) return null;
 
   const confirmDelete = () => {
     if (window.confirm(`Are you sure you want to delete blotter #${blotter.blotterNumber || blotter.custom_id}? This action cannot be undone.`)) {
@@ -130,9 +157,19 @@ const ViewBlotterModal = ({ isOpen, onClose, blotter, onEdit }) => {
               </p>
             </div>
 
+            {/* Assigned Officer with profile picture */}
             <div>
-              <p className="text-sm text-gray-500">Assigned Officer</p>
-              <p className="text-gray-800 font-semibold">{officerName}</p>
+              <p className="text-sm text-gray-500 mb-2">Assigned Officer</p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border">
+                  {officerProfilePicUrl ? (
+                    <img src={officerProfilePicUrl} alt="Officer" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={20} className="text-gray-400" />
+                  )}
+                </div>
+                <p className="text-gray-800 font-semibold">{officerName}</p>
+              </div>
             </div>
 
             <div>
