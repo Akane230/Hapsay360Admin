@@ -7,24 +7,6 @@ import api from '../utils/api';
 const ViewBlotterModal = ({ isOpen, onClose, blotter, onEdit }) => {
   const queryClient = useQueryClient();
 
-  // Fetch user profile picture as blob if it exists
-  const { data: userProfilePicUrl } = useQuery({
-    queryKey: ['userProfilePic', blotter?.user_id?._id],
-    queryFn: async () => {
-      if (!blotter?.user_id?._id) return null;
-      try {
-        const response = await api.get(`/users/${blotter.user_id._id}/profile-picture`);
-        if (!response.ok) return null;
-        const blob = await response.blob();
-        return URL.createObjectURL(blob);
-      } catch (error) {
-        console.error('Failed to fetch user profile picture:', error);
-        return null;
-      }
-    },
-    enabled: isOpen && !!blotter?.user_id?._id,
-  });
-
   // Fetch officer profile picture as blob if it exists
   const { data: officerProfilePicUrl } = useQuery({
     queryKey: ['officerProfilePic', blotter?.assigned_Officer?._id],
@@ -43,6 +25,9 @@ const ViewBlotterModal = ({ isOpen, onClose, blotter, onEdit }) => {
     enabled: isOpen && !!blotter?.assigned_Officer?._id,
   });
 
+  // Cleanup blob URL when component unmounts
+  React.useEffect(() => {
+    return () => {
   // Fetch all blotter attachments as blobs
   const { data: attachmentUrls, isLoading: attachmentsLoading, error: attachmentsError } = useQuery({
     queryKey: ['blotterAttachments', blotter?._id],
